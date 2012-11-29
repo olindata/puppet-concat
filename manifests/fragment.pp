@@ -1,5 +1,5 @@
 # Puts a file fragment into a directory previous setup using concat
-# 
+#
 # OPTIONS:
 #   - target    The file that these fragments belong to
 #   - content   If present puts the content into the file
@@ -14,8 +14,8 @@
 #   - backup    Controls the filebucketing behavior of the final file and
 #               see File type reference for its use.  Defaults to 'puppet'
 define concat::fragment($target, $content='', $source='', $order=10, $ensure = 'present', $mode = '0644', $owner = $::id, $group = $concat::setup::root_group, $backup = 'puppet') {
-  $safe_name = regsubst($name, '/', '_', 'G')
-  $safe_target_name = regsubst($target, '/', '_', 'G')
+  $safe_name = regsubst($name, '[/\n]', '_', 'GM')
+  $safe_target_name = regsubst($target, '[/\n]', '_', 'GM')
   $concatdir = $concat::setup::concatdir
   $fragdir = "${concatdir}/${safe_target_name}"
 
@@ -28,6 +28,9 @@ define concat::fragment($target, $content='', $source='', $order=10, $ensure = '
           case $ensure {
             '', 'absent', 'present', 'file', 'directory': {
               crit('No content, source or symlink specified')
+            }
+            default: {
+              #do nothing, make puppet-lint happy.
             }
           }
         }
